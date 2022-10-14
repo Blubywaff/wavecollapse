@@ -1,0 +1,36 @@
+{
+    "blank":{
+        "imageFiles":["fivepart/blank.png"],
+        "rotations":"A",
+        "faces":{
+            "*":{"connectionType":"B"}
+        }
+    },
+    "t":{
+        "imageFiles":["fivepart/up.png","fivepart/right.png","fivepart/down.png","fivepart/left.png"],
+        "rotations":"ABCD",
+        "faces":{
+            "A":{"connectionType":"A"},
+            "B":{"connectionType":"A"},
+            "C":{"connectionType":"B"},
+            "D":{"connectionType":"A"}
+        }
+    },
+    "f":{
+        "imageFiles":["f_A.png"],
+        "rotations": "A",
+        "faces":{
+            "*":{"connectionType":"A"}
+        }
+    },
+    "o":{
+        "imageFiles":["o_A.png","o_B.png","o_C.png","o_D.png"],
+        "rotations": "ABCD",
+        "faces":{
+            "A":{"connectionType":"A"},
+            "B":{"connectionType":"B"},
+            "C":{"connectionType":"B"},
+            "D":{"connectionType":"B"}
+        }
+    }
+}

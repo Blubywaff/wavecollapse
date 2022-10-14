@@ -6,41 +6,18 @@ let chftr = (a) => {
     });
 }
 
-const DIM = 25;
+const DIM = 50;
 const CSIZE = 500;
 const DSIZE = CSIZE / DIM;
+const TSUITE = "morepart";
 
-let TILES = {
-    blank: {
-        imageFiles: ["tiles/blank.png"],
-        rotations: "A",
-        faces: {
-            "*": {
-                connectionType: "B",
-            },
-        },
-    },
-    t: {
-        imageFiles: ["tiles/up.png", "tiles/right.png", "tiles/down.png", "tiles/left.png"],
-        rotations: "ABCD",
-        faces: {
-            "A": {
-                connectionType: "A",
-            },
-            "B": {
-                connectionType: "A",
-            },
-            "C": {
-                connectionType: "B",
-            },
-            "D": {
-                connectionType: "A",
-            },
-        },
-    },
-}
+let TILES;
 
 let grid = [];
+
+function preload() {
+    TILES = loadJSON(`tiles/${TSUITE}/tiles.json`);
+}
 
 function setup() {
     // Expand symmetrix ("*") faces
@@ -57,6 +34,7 @@ function setup() {
         delete tile.faces["*"];
     }
     // Expand tile rotations
+    // and load images
     let shifter = {
         "A": "B",
         "B": "C",
@@ -76,7 +54,7 @@ function setup() {
         let faces = tile.faces;
         for(r of tile.rotations) {
             obj = {
-                image: loadImage(tile.imageFiles[imgshif[r]]),
+                image: loadImage(`tiles/${TSUITE}/images/${tile.imageFiles[imgshif[r]]}`),
                 faces: faces,
             }
             t2[`${name}.${r}`] = obj;

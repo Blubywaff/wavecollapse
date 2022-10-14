@@ -1,0 +1,19 @@
+{
+    "blank":{
+        "imageFiles":["blank.png"],
+        "rotations":"A",
+        "faces":{
+            "*":{"connectionType":"B"}
+        }
+    },
+    "t":{
+        "imageFiles":["up.png","right.png","down.png","left.png"],
+        "rotations":"ABCD",
+        "faces":{
+            "A":{"connectionType":"A"},
+            "B":{"connectionType":"A"},
+            "C":{"connectionType":"B"},
+            "D":{"connectionType":"A"}
+        }
+    }
+}
