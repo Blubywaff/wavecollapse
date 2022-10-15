@@ -6,10 +6,10 @@ let chftr = (a) => {
     });
 }
 
-const DIM = 50;
+const DIM = 100;
 const CSIZE = 500;
 const DSIZE = CSIZE / DIM;
-const TSUITE = "morepart";
+const TSUITE = "weightpart";
 
 let TILES;
 
@@ -54,6 +54,7 @@ function setup() {
         let faces = tile.faces;
         for(r of tile.rotations) {
             obj = {
+                ...tile,
                 image: loadImage(`tiles/${TSUITE}/images/${tile.imageFiles[imgshif[r]]}`),
                 faces: faces,
             }
@@ -66,6 +67,7 @@ function setup() {
         }
     }
     TILES = t2;
+
     // fill grid
     let all = [];
     for(let t in TILES) {
@@ -116,7 +118,27 @@ function loadOneTile(ind) {
         console.warn('Tried to re-place!');
         return {success: false, error: "re-place"};
     }
-    let vo = tileObject.viable[Math.floor(Math.random()*tileObject.viable.length)];
+    
+    let vo = (() => {
+        let totalweight = tileObject.viable.reduce((p, c) => {
+            return TILES[c].weight + p;
+        }, 0);
+        // Math.random() in [0, 1) so
+        // rand in [0, totalweight)
+        // and sum in (0, totalweight]
+        // (assuming no weights can be zero)
+        // so sum >= rand will eventually be
+        // satisfied for all valid configs.
+        let rand = Math.random()*totalweight;
+        let sum = 0;
+        for(v of tileObject.viable) {
+            sum += TILES[v].weight;
+            if(sum >= rand) {
+                return v;
+            }
+        }
+        console.error("this is bad");
+    })();
     tileObject.placed = true;
     tileObject.viable = vo;
     tileObject.nvia = Object.keys(TILES).length + 1; // So that it gets sorted out on replace
