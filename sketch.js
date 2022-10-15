@@ -93,16 +93,28 @@ function draw() {
             image(TILES[tileObject.viable].image, DSIZE*j, DSIZE*i, DSIZE, DSIZE);
         }
     }
-    loadBoardTile();
+    let status = loadBoardTile();
+    if(!status.success) {
+        console.warn(status);
+        if(status.error == "re-place") {
+            noLoop();
+        }
+    }
 }
 
+/*
+ * Selects a viable option for the `grid` tile at `ind`
+ * and places the tile there. Also updates the tile's
+ * neighbors to reflect the new valid states.
+ * Returns the success status of the operation.
+ */
 function loadOneTile(ind) {
     let tileObject = grid[ind];
     let i = Math.floor(ind / DIM);
     let j = ind % DIM;
     if(tileObject.placed) {
         console.warn('Tried to re-place!');
-        return;
+        return {success: false, error: "re-place"};
     }
     let vo = tileObject.viable[Math.floor(Math.random()*tileObject.viable.length)];
     tileObject.placed = true;
@@ -142,8 +154,14 @@ function loadOneTile(ind) {
     if(j < DIM - 1) {
         check(grid[ind + 1], "B");
     }
+    return {success: true};
 }
 
+/*
+ * Selects a random tile with lowest number of viable states,
+ * and then loads that tile with `loadOneTile`.
+ * Returns the success status and the index attempted.
+ */
 function loadBoardTile() {
     let sb = grid.slice().sort((a, b) => {
         return a.nvia - b.nvia;
@@ -151,6 +169,6 @@ function loadBoardTile() {
     let low = sb[0].nvia;
     sb = sb.filter((a) => {return a.nvia <= low;});
     let choice = sb[Math.floor(Math.random()*sb.length)];
-    loadOneTile(choice.position);
+    return {...loadOneTile(choice.position), index: choice.position};
 }
 
