@@ -3,14 +3,17 @@ const DIM = 100;
 const CSIZE = 500;
 const DSIZE = CSIZE / DIM;
 const TSUITE = "weightpart";
-const FRAMETICK = 10;
+const FRAMETICK = 50;
 const PRERENDER = false;
+const SAVEFRAMES = false;
+const SAVENAME = "out";
 
 let TILES;
 
 let grid = [];
-let frames = [];
-let lastFrame = 0;
+let ticks = [];
+let lastTick = 0;
+let frame = 0;
 
 function preload() {
     TILES = loadJSON(`tiles/${TSUITE}/tiles.json`);
@@ -80,27 +83,37 @@ function setup() {
     
     if(PRERENDER) {
         for(let i = 0; i < DIM*DIM; i++) {
-            frames.push(loadBoardTile().index);
+            ticks.push(loadBoardTile().index);
         }
     }
 
+    if(SAVEFRAMES) frameRate(5);
     createCanvas(CSIZE, CSIZE);
     background(200);
 }
 
+var download = function(){
+    var link = document.createElement('a');
+    link.download = `${SAVENAME}-${(""+frame).padStart(4, "0")}.png`;
+    link.href = document.getElementById('defaultCanvas0').toDataURL()
+    link.click();
+}
+
 function draw() {
+    frame++;
+    if(SAVEFRAMES) download();
     if(PRERENDER) {
-        let curFrame = lastFrame + FRAMETICK;
-        for(let i = lastFrame; i < curFrame; i++) {
-            if(i >= frames.length) {
+        let curTick = lastTick + FRAMETICK;
+        for(let i = lastTick; i < curTick; i++) {
+            if(i >= ticks.length) {
                 noLoop();
                 break;
             }
-            let x = frames[i] % DIM;
-            let y = Math.floor(frames[i] / DIM);
-            image(TILES[grid[frames[i]].viable].image, x * DSIZE, y * DSIZE, DSIZE, DSIZE);
+            let x = ticks[i] % DIM;
+            let y = Math.floor(ticks[i] / DIM);
+            image(TILES[grid[ticks[i]].viable].image, x * DSIZE, y * DSIZE, DSIZE, DSIZE);
         }
-        lastFrame = curFrame;
+        lastTick = curTick;
     } else {
         for(let i = 0; i < FRAMETICK; i++) {
             let status = loadBoardTile();
