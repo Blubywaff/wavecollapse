@@ -10,10 +10,14 @@ const DIM = 100;
 const CSIZE = 500;
 const DSIZE = CSIZE / DIM;
 const TSUITE = "weightpart";
+const FRAMETICK = 50;
 
 let TILES;
 
 let grid = [];
+let frames = [];
+let lastFrame = 0;
+let unloaded = 0;
 
 function preload() {
     TILES = loadJSON(`tiles/${TSUITE}/tiles.json`);
@@ -80,28 +84,27 @@ function setup() {
             nvia: all.length,
         });
     }
+    
+    for(let i = 0; i < DIM*DIM; i++) {
+        frames.push(loadBoardTile().index);
+    }
 
     createCanvas(CSIZE, CSIZE);
     background(200);
 }
 
 function draw() {
-    for(i = 0; i < DIM; i++) {
-        for(j = 0; j < DIM; j++) {
-            let tileObject = grid[i*DIM+j];
-            if(!tileObject.placed) {
-                continue;
-            }
-            image(TILES[tileObject.viable].image, DSIZE*j, DSIZE*i, DSIZE, DSIZE);
-        }
-    }
-    let status = loadBoardTile();
-    if(!status.success) {
-        console.warn(status);
-        if(status.error == "re-place") {
+    let curFrame = lastFrame + FRAMETICK;
+    for(let i = lastFrame; i < curFrame; i++) {
+        if(i >= frames.length) {
             noLoop();
+            break;
         }
+        let x = frames[i] % DIM;
+        let y = Math.floor(frames[i] / DIM);
+        image(TILES[grid[frames[i]].viable].image, x * DSIZE, y * DSIZE, DSIZE, DSIZE);
     }
+    lastFrame = curFrame;
 }
 
 /*
