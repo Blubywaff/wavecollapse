@@ -2,7 +2,7 @@
     "blank":{
         "imageFiles":["fivepart/blank.png"],
         "rotations":"A",
-        "weight": 1,
+        "weight": 100,
         "faces":{
             "*":{"connectionType":"B"}
         }
@@ -10,7 +10,7 @@
     "t":{
         "imageFiles":["fivepart/up.png","fivepart/right.png","fivepart/down.png","fivepart/left.png"],
         "rotations":"ABCD",
-        "weight": 100,
+        "weight": 1,
         "faces":{
             "A":{"connectionType":"A"},
             "B":{"connectionType":"A"},
@@ -21,7 +21,7 @@
     "f":{
         "imageFiles":["f_A.png"],
         "rotations": "A",
-        "weight": 1,
+        "weight": 5,
         "faces":{
             "*":{"connectionType":"A"}
         }
@@ -29,7 +29,7 @@
     "o":{
         "imageFiles":["o_A.png","o_B.png","o_C.png","o_D.png"],
         "rotations": "ABCD",
-        "weight": 1,
+        "weight": 10,
         "faces":{
             "A":{"connectionType":"A"},
             "B":{"connectionType":"B"},
