@@ -1,23 +1,16 @@
-// Debug values
-let changes = [];
-let chftr = (a) => {
-    return changes.filter((b) => {
-        return a == b.position;
-    });
-}
 
 const DIM = 100;
 const CSIZE = 500;
 const DSIZE = CSIZE / DIM;
 const TSUITE = "weightpart";
-const FRAMETICK = 50;
+const FRAMETICK = 10;
+const PRERENDER = false;
 
 let TILES;
 
 let grid = [];
 let frames = [];
 let lastFrame = 0;
-let unloaded = 0;
 
 function preload() {
     TILES = loadJSON(`tiles/${TSUITE}/tiles.json`);
@@ -85,8 +78,10 @@ function setup() {
         });
     }
     
-    for(let i = 0; i < DIM*DIM; i++) {
-        frames.push(loadBoardTile().index);
+    if(PRERENDER) {
+        for(let i = 0; i < DIM*DIM; i++) {
+            frames.push(loadBoardTile().index);
+        }
     }
 
     createCanvas(CSIZE, CSIZE);
@@ -94,17 +89,32 @@ function setup() {
 }
 
 function draw() {
-    let curFrame = lastFrame + FRAMETICK;
-    for(let i = lastFrame; i < curFrame; i++) {
-        if(i >= frames.length) {
+    if(PRERENDER) {
+        let curFrame = lastFrame + FRAMETICK;
+        for(let i = lastFrame; i < curFrame; i++) {
+            if(i >= frames.length) {
+                noLoop();
+                break;
+            }
+            let x = frames[i] % DIM;
+            let y = Math.floor(frames[i] / DIM);
+            image(TILES[grid[frames[i]].viable].image, x * DSIZE, y * DSIZE, DSIZE, DSIZE);
+        }
+        lastFrame = curFrame;
+    } else {
+        for(let i = 0; i < FRAMETICK; i++) {
+            let status = loadBoardTile();
+            if(status.success) {
+                let ind = status.index;
+                let x = ind % DIM;
+                let y = Math.floor(ind / DIM);
+                image(TILES[grid[status.index].viable].image, x * DSIZE, y * DSIZE, DSIZE, DSIZE);
+                continue;
+            }
             noLoop();
             break;
         }
-        let x = frames[i] % DIM;
-        let y = Math.floor(frames[i] / DIM);
-        image(TILES[grid[frames[i]].viable].image, x * DSIZE, y * DSIZE, DSIZE, DSIZE);
     }
-    lastFrame = curFrame;
 }
 
 /*
@@ -145,7 +155,6 @@ function loadOneTile(ind) {
     tileObject.placed = true;
     tileObject.viable = vo;
     tileObject.nvia = Object.keys(TILES).length + 1; // So that it gets sorted out on replace
-    changes.push(JSON.parse(JSON.stringify({from: ind, when: changes.length, ...tileObject})));
     // Checks for neighbors
     let check = (tObj, oren) => {
         if(tObj.placed) {
@@ -165,7 +174,6 @@ function loadOneTile(ind) {
         }
         tObj.viable = possible;
         tObj.nvia = possible.length;
-        changes.push({from: ind, when: changes.length, ...tObj});
     };
     if(i > 0) {
         check(grid[ind - DIM], "A");
