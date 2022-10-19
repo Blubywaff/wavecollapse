@@ -2,7 +2,7 @@
 const DIM = 100;
 const CSIZE = 500;
 const DSIZE = CSIZE / DIM;
-const TSUITE = "weightpart";
+const TSUITE = "rotpart";
 const FRAMETICK = 50;
 const PRERENDER = false;
 const SAVEFRAMES = false;
@@ -23,6 +23,13 @@ function setup() {
     // Expand symmetrix ("*") faces
     for(t in TILES) {
         let tile = TILES[t];
+        let root = tile.imageRoot;
+        if(root != undefined) {
+            for(let i = 0; i < tile.imageFiles.length; i++) {
+                tile.imageFiles[i] = `${root}/${tile.imageFiles[i]}`;
+                console.log(tile.imageRoot, tile.imageFiles[i]);
+            }
+        }
         faceObject = tile.faces["*"];
         if(!faceObject) {
             continue;
@@ -32,12 +39,6 @@ function setup() {
         tile.faces["C"] = faceObject;
         tile.faces["D"] = faceObject;
         delete tile.faces["*"];
-        let root = tile.imageRoot;
-        if(root != undefined) {
-            for(let i = 0; i < tile.imageFiles.length; i++) {
-                tile.imageFiles[i] = `${root}/${tile.imageFiles[i]}`;
-            }
-        }
     }
     // Expand tile rotations
     // and load images

@@ -1,0 +1,44 @@
+{
+    "blank":{
+        "imageRoot":"weightpart",
+        "imageFiles":["fivepart/blank.png"],
+        "rotations":"A",
+        "weight": 1,
+        "faces":{
+            "*":{"connectionType":"B"}
+        }
+    },
+    "t":{
+        "imageRoot":"weightpart/fivepart",
+        "imageFiles":["up.png","right.png","down.png","left.png"],
+        "rotations":"ABCD",
+        "weight": 1,
+        "faces":{
+            "A":{"connectionType":"A"},
+            "B":{"connectionType":"A"},
+            "C":{"connectionType":"B"},
+            "D":{"connectionType":"A"}
+        }
+    },
+    "f":{
+        "imageRoot":"weightpart",
+        "imageFiles":["f_A.png"],
+        "rotations": "A",
+        "weight": 1,
+        "faces":{
+            "*":{"connectionType":"A"}
+        }
+    },
+    "o":{
+        "imageRoot":"weightpart",
+        "imageFiles":["o_A.png","o_B.png","o_C.png","o_D.png"],
+        "rotations": "ABCD",
+        "weight": 1,
+        "faces":{
+            "A":{"connectionType":"A"},
+            "B":{"connectionType":"B"},
+            "C":{"connectionType":"B"},
+            "D":{"connectionType":"B"}
+        }
+    }
+}
