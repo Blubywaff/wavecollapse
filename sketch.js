@@ -182,8 +182,7 @@ function loadOneTile(ind) {
         let allowed = TILES[tileObject.viable].faces[oren].connectionType;
         let possible = tObj.viable.filter((v)=>{return TILES[v].faces[flip[oren]].connectionType == allowed});
         if(possible.length == 0) {
-            console.warn("No viable for neighbor");
-            possible.push("blank.A"); // to ensure that it does not crash
+            console.error("No viable for neighbor");
         }
         tObj.viable = possible;
         tObj.nvia = possible.length;
