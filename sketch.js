@@ -20,17 +20,78 @@ function preload() {
 }
 
 function setup() {
-    // Expand symmetrix ("*") faces
+    // function for rotation faces
+    let fshift = (r, faces) => {
+        let f2 = {};
+        for(f in faces) {
+            let shift = String.fromCharCode((f.charCodeAt(0) + r.charCodeAt(0) - 130)%4 + 65);
+            f2[shift] = faces[f];
+        }
+        return f2;
+    }
+
+    // function for face flips
+    let frot = (r, faces) => {
+        let f2 = {};
+        for(f in faces) {
+            let shift = f;
+            if(r == "V" || r == "<") {
+                shift = {
+                    "A": "C",
+                    "C": "A",
+                    "B": "B",
+                    "D": "D"
+                }[shift];
+            }
+            else if(r == "H" || r == "I") {
+                shift = {
+                    "A": "A",
+                    "C": "C",
+                    "B": "D",
+                    "D": "B"
+                }[shift];
+            }
+            if(r == "<" || r == "I") {
+                shift = String.fromCharCode((shift.charCodeAt(0) - 64)%4 + 65);
+            }
+            f2[shift] = faces[f];
+            f2[shift] = {
+                connectionType: faces[f].connectionType,
+                reflection: {"*": "*", "N": "F", "F": "N"}[faces[f].reflection]
+            };
+        }
+        return f2;
+    }
+
     for(t in TILES) {
         let tile = TILES[t];
+        // Expand fields that don't exist
+        if(tile.reflections == undefined) {
+            tile.reflections = "";
+        }
+        // Generate image file names from prefix and suffix
+        if(tile.imageFiles == undefined) {
+            tile.imageFiles = [];
+            for(r of "ABCDVHKI") {
+                tile.imageFiles.push(tile.imagePrefix+r+tile.imageSuffix);
+            }
+        }
+        // Expand imageRoot to file references
         let root = tile.imageRoot;
         if(root != undefined) {
             for(let i = 0; i < tile.imageFiles.length; i++) {
                 tile.imageFiles[i] = `${root}/${tile.imageFiles[i]}`;
-                console.log(tile.imageRoot, tile.imageFiles[i]);
             }
         }
-        faceObject = tile.faces["*"];
+        // Expand reflection for symmetric faces
+        for(fn in tile.faces) {
+            face = tile.faces[fn];
+            if(face.reflection == undefined) {
+                face.reflection = "*";
+            }
+        }
+        // Expand symmetrix ("*") faces
+        let faceObject = tile.faces["*"];
         if(!faceObject) {
             continue;
         }
@@ -40,30 +101,32 @@ function setup() {
         tile.faces["D"] = faceObject;
         delete tile.faces["*"];
     }
+
     // Expand tile rotations
+    // and reflections
     // and load images
-    let shifter = (face, rotation) => {
-        return String.fromCharCode((face.charCodeAt(0) + rotation.charCodeAt(0) - 130)%4 + 65);
-    }
-    let fconv = (r, faces) => {
-        let f2 = {};
-        for(f in faces) {
-            f2[shifter(f, r)] = faces[f];
-        }
-        return f2;
-    }
     let t2 = {};
     for(t in TILES) {
-        let name = t;
         let tile = TILES[t];
+        let name = t;
         let faces = tile.faces;
-        for(let i = 0; i < tile.rotations.length; i++) {
+        let rotlen = tile.rotations.length;
+        for(let i = 0; i < rotlen; i++) {
             let r = tile.rotations[i];
-            obj = {
+            let obj = {
                 image: loadImage(`tiles/${TSUITE}/images/${tile.imageFiles[i]}`),
                 weight: tile.weight,
-                faces: fconv(r, faces),
-            }
+                faces: fshift(r, faces),
+            };
+            t2[`${name}.${r}`] = obj;
+        }
+        for(let i = 0; i < tile.reflections.length; i++) {
+            let r = tile.reflections[i];
+            let obj = {
+                image: loadImage(`tiles/${TSUITE}/images/${tile.imageFiles[i+rotlen]}`),
+                weight: tile.weight,
+                faces: frot(r, faces),
+            };
             t2[`${name}.${r}`] = obj;
         }
     }
@@ -138,6 +201,13 @@ function draw() {
  * Returns the success status of the operation.
  */
 function loadOneTile(ind) {
+    let facesEqual = (f1, f2) => {
+        return f1.connectionType == f2.connectionType && (
+            (f2.reflection == f1.reflection && f2.reflection == "*")
+            || (f2.reflection == "N" && f1.reflection == "F")
+            || (f2.reflection == "F" && f1.reflection == "N")
+        );
+    }
     let tileObject = grid[ind];
     let i = Math.floor(ind / DIM);
     let j = ind % DIM;
@@ -180,8 +250,8 @@ function loadOneTile(ind) {
             "B": "D",
             "D": "B",
         }
-        let allowed = TILES[tileObject.viable].faces[oren].connectionType;
-        let possible = tObj.viable.filter((v)=>{return TILES[v].faces[flip[oren]].connectionType == allowed});
+        let allowed = TILES[tileObject.viable].faces[oren];
+        let possible = tObj.viable.filter((v)=>{return facesEqual(TILES[v].faces[flip[oren]], allowed)});
         if(possible.length == 0) {
             console.error("No viable for neighbor");
         }
