@@ -22,7 +22,7 @@ function preload() {
 function setup() {
     // Expand symmetrix ("*") faces
     for(t in TILES) {
-        tile = TILES[t];
+        let tile = TILES[t];
         faceObject = tile.faces["*"];
         if(!faceObject) {
             continue;
@@ -32,38 +32,38 @@ function setup() {
         tile.faces["C"] = faceObject;
         tile.faces["D"] = faceObject;
         delete tile.faces["*"];
+        let root = tile.imageRoot;
+        if(root != undefined) {
+            for(let i = 0; i < tile.imageFiles.length; i++) {
+                tile.imageFiles[i] = `${root}/${tile.imageFiles[i]}`;
+            }
+        }
     }
     // Expand tile rotations
     // and load images
-    let shifter = {
-        "A": "B",
-        "B": "C",
-        "C": "D",
-        "D": "A",
-    };
-    let imgshif = {
-        "A": 0,
-        "B": 1,
-        "C": 2,
-        "D": 3,
-    };
+    let shifter = (face, rotation) => {
+        return String.fromCharCode((face.charCodeAt(0) + rotation.charCodeAt(0) - 130)%4 + 65);
+    }
+    let fconv = (r, faces) => {
+        let f2 = {};
+        for(f in faces) {
+            f2[shifter(f, r)] = faces[f];
+        }
+        return f2;
+    }
     let t2 = {};
     for(t in TILES) {
         let name = t;
         let tile = TILES[t];
         let faces = tile.faces;
-        for(r of tile.rotations) {
+        for(let i = 0; i < tile.rotations.length; i++) {
+            let r = tile.rotations[i];
             obj = {
-                ...tile,
-                image: loadImage(`tiles/${TSUITE}/images/${tile.imageFiles[imgshif[r]]}`),
-                faces: faces,
+                image: loadImage(`tiles/${TSUITE}/images/${tile.imageFiles[i]}`),
+                weight: tile.weight,
+                faces: fconv(r, faces),
             }
             t2[`${name}.${r}`] = obj;
-            let faces2 = {};
-            for(c of "ABCD") {
-                faces2[shifter[c]] = faces[c];
-            }
-            faces = faces2;
         }
     }
     TILES = t2;
