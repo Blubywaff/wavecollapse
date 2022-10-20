@@ -1,12 +1,13 @@
 
-const DIM = 100;
+const DIM = 50;
 const CSIZE = 500;
 const DSIZE = CSIZE / DIM;
-const TSUITE = "rotpart";
+const TSUITE = "weightpart";
 const FRAMETICK = 50;
 const PRERENDER = false;
 const SAVEFRAMES = false;
 const SAVENAME = "out";
+const SEED = null;
 
 let TILES;
 
@@ -154,6 +155,7 @@ function setup() {
     if(SAVEFRAMES) frameRate(5);
     createCanvas(CSIZE, CSIZE);
     background(200);
+    if(SEED) randomSeed(SEED);
 }
 
 var download = function(){
@@ -220,13 +222,13 @@ function loadOneTile(ind) {
         let totalweight = tileObject.viable.reduce((p, c) => {
             return TILES[c].weight + p;
         }, 0);
-        // Math.random() in [0, 1) so
+        // random() in [0, 1) so
         // rand in [0, totalweight)
         // and sum in (0, totalweight]
         // (assuming no weights can be zero)
         // so sum >= rand will eventually be
         // satisfied for all valid configs.
-        let rand = Math.random()*totalweight;
+        let rand = random()*totalweight;
         let sum = 0;
         for(v of tileObject.viable) {
             sum += TILES[v].weight;
@@ -284,7 +286,7 @@ function loadBoardTile() {
     });
     let low = sb[0].nvia;
     sb = sb.filter((a) => {return a.nvia <= low;});
-    let choice = sb[Math.floor(Math.random()*sb.length)];
+    let choice = sb[Math.floor(random()*sb.length)];
     return {...loadOneTile(choice.position), index: choice.position};
 }
 
